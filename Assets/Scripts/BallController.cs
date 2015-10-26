@@ -52,9 +52,8 @@ public class BallController : MonoBehaviour {
         float Vy = Vz * A;
         float T0 = (Vz + Mathf.Sqrt(Vz * Vz + 2 * g * h0)) / g;
         float Vx = w * x_forceFactor / T0;
-        v = new Vector3(Vx, Vy, Vz);
         m_rb.isKinematic = false;
-        m_rb.velocity = v;
+        m_rb.velocity = new Vector3(Vx, Vy, Vz);
     }
     
 }
