@@ -8,14 +8,16 @@ public class BallController : MonoBehaviour {
     public float z_forceFactor;
     public float angle;
     public float minDistance;
-
+    public float k;
+    
     private Vector3 m_startPosition;
     private Rigidbody m_rb;
     private Vector3 m_ballRespawn;
-
+    private bool m_startDrag;
     void Start()
     {
         m_rb = GetComponent<Rigidbody>();
+        m_startDrag = false;
         m_ballRespawn = m_rb.position;
     }
 
@@ -36,7 +38,6 @@ public class BallController : MonoBehaviour {
                 distance = curDistance;
             }
         }
-        
         if (closest == null)
             return false;
         closest.SetActive(false);
@@ -45,13 +46,14 @@ public class BallController : MonoBehaviour {
 
     void OnMouseDown()
     {
-        m_startPosition = getPosition();
+        m_startPosition = Input.mousePosition;
+        m_startDrag = true;
     }
 
     Vector3 getPosition()
     {
-        Vector3 result = Input.mousePosition;
-        return result;
+        Vector3 viewPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+        return Camera.main.ViewportToWorldPoint(new Vector3(viewPos.x, viewPos.y, k));
     }
 
     float getAngle()
@@ -61,7 +63,7 @@ public class BallController : MonoBehaviour {
 
     void OnMouseUp()
     {
-        Vector3 endPosition = getPosition();
+        Vector3 endPosition = Input.mousePosition;
         Vector3 speed = endPosition - m_startPosition;
         getAngle();
         float h = speed.y;
@@ -74,16 +76,22 @@ public class BallController : MonoBehaviour {
         float T0 = (Vz + Mathf.Sqrt(Vz * Vz + 2 * g * h0)) / g;
         float Vx = w * x_forceFactor / T0;
         m_rb.isKinematic = false;
+        m_startDrag = false;
         m_rb.velocity = new Vector3(Vx, Vy, Vz);
     }
     void die()
     {
         m_rb.isKinematic = true;
+        
         m_rb.velocity = new Vector3(0, 0, 0);
         m_rb.position = m_ballRespawn;
     }
     void Update()
     {
+        if (m_startDrag)
+        {
+            m_rb.position = getPosition();
+        }
         if (m_rb.position.y < 0)
             die();
         else if (m_rb.position.y < 0.7)
