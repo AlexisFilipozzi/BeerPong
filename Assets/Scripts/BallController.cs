@@ -83,9 +83,11 @@ public class BallController : MonoBehaviour {
         float T0 = (Vz + Mathf.Sqrt(Vz * Vz + 2 * g * h0)) / g;
         float Vx = w * x_forceFactor / T0;
         m_rb.isKinematic = false;
-        m_rb.velocity = new Vector3(Vx, Vy, Vz);
+        Vector3 vel = new Vector3(Vx, Vy, Vz);
+        m_rb.velocity = vel;
         m_canBeDrag = false;
     }
+
     void die()
     {
         m_rb.isKinematic = true;
@@ -93,6 +95,7 @@ public class BallController : MonoBehaviour {
         m_rb.position = m_ballRespawn;
         m_canBeDrag = true;
     }
+
     void Update()
     {
         if (m_rb.position.y < 0)
