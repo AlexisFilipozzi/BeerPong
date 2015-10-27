@@ -12,11 +12,13 @@ public class BallController : MonoBehaviour {
     private Vector3 m_startPosition;
     private Rigidbody m_rb;
     private Vector3 m_ballRespawn;
+    private bool m_canBeDrag;
 
     void Start()
     {
         m_rb = GetComponent<Rigidbody>();
         m_ballRespawn = m_rb.position;
+        m_canBeDrag = true;
     }
 
     bool DisableCupIfWin()
@@ -45,7 +47,10 @@ public class BallController : MonoBehaviour {
 
     void OnMouseDown()
     {
-        m_startPosition = getPosition();
+        if (m_canBeDrag)
+        {
+            m_startPosition = getPosition();
+        }
     }
 
     Vector3 getPosition()
@@ -61,6 +66,10 @@ public class BallController : MonoBehaviour {
 
     void OnMouseUp()
     {
+        if (!m_canBeDrag)
+        {
+            return;
+        }
         Vector3 endPosition = getPosition();
         Vector3 speed = endPosition - m_startPosition;
         getAngle();
@@ -75,12 +84,14 @@ public class BallController : MonoBehaviour {
         float Vx = w * x_forceFactor / T0;
         m_rb.isKinematic = false;
         m_rb.velocity = new Vector3(Vx, Vy, Vz);
+        m_canBeDrag = false;
     }
     void die()
     {
         m_rb.isKinematic = true;
         m_rb.velocity = new Vector3(0, 0, 0);
         m_rb.position = m_ballRespawn;
+        m_canBeDrag = true;
     }
     void Update()
     {
