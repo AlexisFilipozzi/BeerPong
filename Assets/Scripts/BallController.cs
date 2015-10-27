@@ -7,24 +7,45 @@ public class BallController : MonoBehaviour {
     public float x_forceFactor;
     public float z_forceFactor;
     public float angle;
+    public float minDistance;
 
-    private float m_startTime;
     private Vector3 m_startPosition;
     private Rigidbody m_rb;
+    private Vector3 m_ballRespawn;
 
     void Start()
     {
         m_rb = GetComponent<Rigidbody>();
+        m_ballRespawn = m_rb.position;
+    }
+
+    bool DisableCupIfWin()
+    {
+        GameObject[] cups;
+        cups = GameObject.FindGameObjectsWithTag("cup");
+        GameObject closest = null;
+        float distance = minDistance;
+        Vector3 position = m_rb.position;
+        foreach (GameObject cup in cups)
+        {
+            Vector3 diff = cup.transform.position - position;
+            float curDistance = diff.sqrMagnitude;
+            if (curDistance < distance)
+            {
+                closest = cup;
+                distance = curDistance;
+            }
+        }
+        
+        if (closest == null)
+            return false;
+        closest.SetActive(false);
+        return true;
     }
 
     void OnMouseDown()
     {
-        m_startTime = Time.time;
         m_startPosition = getPosition();
-        print("Test " + forceFactor);
-        print("Gravity" + Physics.gravity);
-        // set position of the ball
-
     }
 
     Vector3 getPosition()
@@ -54,6 +75,24 @@ public class BallController : MonoBehaviour {
         float Vx = w * x_forceFactor / T0;
         m_rb.isKinematic = false;
         m_rb.velocity = new Vector3(Vx, Vy, Vz);
+    }
+    void die()
+    {
+        m_rb.isKinematic = true;
+        m_rb.velocity = new Vector3(0, 0, 0);
+        m_rb.position = m_ballRespawn;
+    }
+    void Update()
+    {
+        if (m_rb.position.y < 0)
+            die();
+        else if (m_rb.position.y < 0.7)
+        {
+            if(DisableCupIfWin())
+                die();
+            if (Mathf.Abs(m_rb.velocity.magnitude) < 2)
+                die();
+        }
     }
     
 }
