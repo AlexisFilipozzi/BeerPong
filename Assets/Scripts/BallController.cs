@@ -14,11 +14,20 @@ public class BallController : MonoBehaviour {
     private Rigidbody m_rb;
     private Vector3 m_ballRespawn;
     private bool m_startDrag;
+    private bool m_canBeDrag;
+    private float dt = 0.5F;
+    private float DT = 0.0F;
+    private Vector3 pos0;
+    private Vector3 pos1;
+
     void Start()
     {
         m_rb = GetComponent<Rigidbody>();
         m_startDrag = false;
         m_ballRespawn = m_rb.position;
+        pos0 = m_rb.position;
+        pos1 = m_rb.position;
+        m_canBeDrag = true;
     }
 
     bool DisableCupIfWin()
@@ -46,8 +55,11 @@ public class BallController : MonoBehaviour {
 
     void OnMouseDown()
     {
-        m_startPosition = Input.mousePosition;
         m_startDrag = true;
+        if (m_canBeDrag)
+        {
+            m_startPosition = Input.mousePosition;
+        }
     }
 
     Vector3 getPosition()
@@ -64,6 +76,10 @@ public class BallController : MonoBehaviour {
     void OnMouseUp()
     {
         Vector3 endPosition = Input.mousePosition;
+        if (!m_canBeDrag)
+        {
+            return;
+        }
         Vector3 speed = endPosition - m_startPosition;
         getAngle();
         float h = speed.y;
@@ -77,17 +93,37 @@ public class BallController : MonoBehaviour {
         float Vx = w * x_forceFactor / T0;
         m_rb.isKinematic = false;
         m_startDrag = false;
-        m_rb.velocity = new Vector3(Vx, Vy, Vz);
+        Vector3 vel = new Vector3(Vx, Vy, Vz);
+        m_rb.velocity = vel;
+        m_canBeDrag = false;
     }
+
+    float getAcceleration()
+    {
+        Vector3 acc = pos0 - 2*pos1 + m_rb.position;
+        pos0 = pos1;
+        pos1 = m_rb.position;
+        return acc.magnitude;
+    }
+
     void die()
     {
         m_rb.isKinematic = true;
-        
         m_rb.velocity = new Vector3(0, 0, 0);
         m_rb.position = m_ballRespawn;
+        m_canBeDrag = true;
     }
+
     void Update()
     {
+        if (Time.time > DT)
+        {
+            DT = Time.time + dt;
+            if (m_startDrag && getAcceleration() < 1)
+            {
+                m_startPosition = Input.mousePosition;
+            }
+        }
         if (m_startDrag)
         {
             m_rb.position = getPosition();
