@@ -15,7 +15,7 @@ public class BallController : MonoBehaviour {
     private Vector3 m_ballRespawn;
     private bool m_startDrag;
     private bool m_canBeDrag;
-    private float dt = 0.5F;
+    private float dt = 0.2F;
     private float DT = 0.0F;
     private Vector3 pos0;
     private Vector3 pos1;
@@ -123,7 +123,7 @@ public class BallController : MonoBehaviour {
         if (Time.time > DT)
         {
             DT = Time.time + dt;
-            if (m_startDrag && getAcceleration() < 1)
+            if (m_startDrag && getAcceleration() < 2)
             {
                 m_startPosition = Input.mousePosition;
             }
