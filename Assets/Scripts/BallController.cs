@@ -15,7 +15,7 @@ public class BallController : MonoBehaviour {
     private Vector3 m_ballRespawn;
     private bool m_startDrag;
     private bool m_canBeDrag;
-    private float dt = 0.2F;
+    private float dt = 0.1F;
     private float DT = 0.0F;
     private Vector3 pos0;
     private Vector3 pos1;
@@ -138,7 +138,7 @@ public class BallController : MonoBehaviour {
         {
             if(DisableCupIfWin())
                 die();
-            if (Mathf.Abs(m_rb.velocity.magnitude) < 2)
+            if (Mathf.Abs(m_rb.velocity.magnitude) < 2 || (m_rb.velocity.z<0 && m_rb.velocity.y == 0))
                 die();
         }
     }
