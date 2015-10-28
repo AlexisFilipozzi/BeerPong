@@ -55,9 +55,9 @@ public class BallController : MonoBehaviour {
 
     void OnMouseDown()
     {
-        m_startDrag = true;
         if (m_canBeDrag)
         {
+            m_startDrag = true;
             m_startPosition = Input.mousePosition;
         }
     }
