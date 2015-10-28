@@ -68,9 +68,14 @@ public class BallController : MonoBehaviour {
         return Camera.main.ViewportToWorldPoint(new Vector3(viewPos.x, viewPos.y, k));
     }
 
-    float getAngle()
+    float getAngle(float h)
     {
-        return (Mathf.PI/180)*angle;
+        print(h);
+        print(180/Mathf.PI*Mathf.Atan(h / 1000));
+        float temp = Mathf.Atan(h / 1000);
+        if (h < 0)
+            temp += -25 / 180 * Mathf.PI;
+        return temp;
     }
 
     void OnMouseUp()
@@ -81,13 +86,12 @@ public class BallController : MonoBehaviour {
             return;
         }
         Vector3 speed = endPosition - m_startPosition;
-        getAngle();
         float h = speed.y;
         float h0 = m_rb.position.y;
         float w = speed.x;
         float g = Physics.gravity.magnitude;
-        float A = Mathf.Tan(getAngle());
-        float Vz = Mathf.Sqrt(g)*h*z_forceFactor/Mathf.Sqrt(2*A*h*z_forceFactor+2*h0);
+        float A = Mathf.Tan(getAngle(h));
+        float Vz = Mathf.Sqrt(g)*Mathf.Abs(h)*z_forceFactor/Mathf.Sqrt(2*A*h*z_forceFactor+2*h0);
         float Vy = Vz * A;
         float T0 = (Vz + Mathf.Sqrt(Vz * Vz + 2 * g * h0)) / g;
         float Vx = w * x_forceFactor / T0;
