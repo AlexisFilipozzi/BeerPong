@@ -8,7 +8,6 @@ public class BallController : MonoBehaviour {
     public float z_forceFactor;
     public float angle;
     public float minDistance;
-    public float k;
     
     private Vector3 m_startPosition;
     private Rigidbody m_rb;
@@ -19,6 +18,7 @@ public class BallController : MonoBehaviour {
     private float DT = 0.0F;
     private Vector3 pos0;
     private Vector3 pos1;
+    private float m_ballCameraDistance;
 
     void Start()
     {
@@ -28,6 +28,15 @@ public class BallController : MonoBehaviour {
         pos0 = m_rb.position;
         pos1 = m_rb.position;
         m_canBeDrag = true;
+
+        // getting the initial distance ball camera
+        float squareDistCameraBallX = transform.position.x - Camera.main.transform.position.x;
+        squareDistCameraBallX = squareDistCameraBallX * squareDistCameraBallX;
+        float squareDistCameraBallY = transform.position.y - Camera.main.transform.position.y;
+        squareDistCameraBallY = squareDistCameraBallY * squareDistCameraBallY;
+        float squareDistCameraBallZ = transform.position.z - Camera.main.transform.position.z;
+        squareDistCameraBallZ = squareDistCameraBallZ * squareDistCameraBallZ;
+        m_ballCameraDistance = Mathf.Sqrt(squareDistCameraBallX + squareDistCameraBallY + squareDistCameraBallZ);
     }
 
     bool DisableCupIfWin()
@@ -65,7 +74,8 @@ public class BallController : MonoBehaviour {
     Vector3 getPosition()
     {
         Vector3 viewPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-        return Camera.main.ViewportToWorldPoint(new Vector3(viewPos.x, viewPos.y, k));
+        
+        return Camera.main.ViewportToWorldPoint(new Vector3(viewPos.x, viewPos.y, m_ballCameraDistance));
     }
 
     float getAngle(float h)
